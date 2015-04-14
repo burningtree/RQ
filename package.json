@@ -1,5 +1,5 @@
 {
-  "name": "RQ",
+  "name": "async-rq",
   "version": "0.0.1",
   "description": "Better living through asynchronicity",
   "main": "rq.js",
