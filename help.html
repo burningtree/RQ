@@ -52,7 +52,7 @@ h3 {
 
 h4 {
     font-family: Monospace;
-    font-size: 14pt;
+    font-size: 1em;
     font-weight: bold;
     padding-bottom: 0;
     text-align: left;
@@ -64,15 +64,19 @@ i {
 
 pre {
     font-family: Monospace;
+    font-size: 1em;
+    font-weight: bold;
     margin-left: 1in;
 }
 
 p {
     margin-left: 10pt;
+    text-align: justify;
 }
 code {
-	font-size: 100%;
-	font-weight: bold;
+    font-family: Monospace;
+    font-size: 1em;
+    font-weight: bold;
 }
 </style>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8"></head>
@@ -80,35 +84,53 @@ code {
 <body>
 <h1>RQ</h1>
 <p>Douglas Crockford<br>
-    2015-04-13
+    2015-04-14
 </p>
 <p><b><code>RQ</code></b> is a small JavaScript library for managing asynchronicity in server applications. </p>
-<p>The source is available at  <a href="https://github.com/douglascrockford/RQ">https://github.com/douglascrockford/RQ</a>. This page is available at <a href="http://www.RQ.crockford.com/">http://www.RQ.crockford.com/</a>.</p>
+<p>The source is available at  <a href="https://github.com/douglascrockford/RQ">https://github.com/douglascrockford/RQ</a>. This page is available at <a href="http://www.RQ.crockford.com/">http://www.RQ.crockford.com/</a>. It is in the Public Domain.</p>
 <h2>Asynchronicity</h2>
 <p>Asynchronicity is becoming the preferred method for solving a large class of problems, from user interfaces to servers. Asynchronous functions return  control to the caller almost immediately. Success or failure will be communicated somehow in the future, but usually the caller will resume long before that occurs. The communication will probably make use of some sort of callback function or continuation.</p>
-<p>Servers offer workflows that are significantly different than those found in user interfaces. An incoming message many require several processing steps in which the result of each step is given to the next step. Since each step may be concluded in a different processing turn, callbacks must be used. The program may not simply block while awaiting results. The na&iuml;ve approach is start each step in the callback function to the previous step. This is a very awkward way to write, producing programs that are brittle, difficult to read, and difficult to maintain. </p>
+<p>Servers offer workflows that are significantly different than those found in user interfaces. An incoming message many require several processing steps in which the result of each step is given to the next step. Since each step may be concluded in a different processing turn, callbacks must be used. The program may not block while awaiting results. The na&iuml;ve approach is start each step in the callback function of the previous step. This is a very awkward way to write, producing programs that are brittle, difficult to read, and difficult to maintain. </p>
 <p>A workflow might have several independent steps, which means that those steps could be taken in parallel, which could have  significant performance benefits. The elapsed time of the steps could be the slowest of all of the steps, instead of the total of all of the steps, which could be a dramatic speed up. But it is not obvious how to take advantage of  parallelism with simple callbacks. The na&iuml;ve approach is to perform each step serially. This is a very awkward way to write, producing programs that a brittle, difficult to read,  difficult to maintain, and much too slow. </p>
 <p>This pattern is so problematic that some of its users have denounced asynchronicity, declaring that it is unnatural and impossible to manage. But it turns out that the problem isn't with asynchronicity. The problem is trying to do asynchronicity without proper tools. There are lots of tools available now, including promises. There are many good things that can be done with promises, but promises were not designed to help manage workflows in servers. </p>
 <p>That is specifically what <code>RQ</code> was designed to do. Asynchronicity is our friend. We should not attempt to hide it or deny it. We must embrace asynchronicity because it is our destiny. <code>RQ</code> gives you the simple tools you need to do that.</p>
 <h2>Workflow</h2>
 <p>With <code>RQ</code>, a workflow is broken into a set of steps or tasks or jobs. Each step is represented by a function. These functions are called <i>requestors</i> because calling one is likely to initiate a request. <code>RQ</code> provides services that can collect some requestors together and process them sequentially or in parallel.</p>
-<p>For example, the <code>getNav</code> requestor will call the <code>getId</code> requestor, give that result to the <code>getPreference</code> requestor, and give that result to the <code>getCustomNav</code> requestor.</p>
-<pre>getNav = RQ.sequence([<br>    getId,<br>    getPreference,
-    getStuff,<br>    getCustomNav,<br>]);
-</pre>
+<p>For example, the <code>respond</code> requestor will call the <code>getId</code> requestor, give that result to the <code>getPreference</code> requestor, and give that result to the <code>getStuff</code> requestor. The <code>buildPage</code> requestor will use the stuff to build a page.</p>
+<pre>respond = RQ.sequence([
+    getId,
+    getPreference,
+    getStuff,
+    buildPage,
+]);</pre>
 <p>The <code>getStuff</code> requestor that was used above will produce an array of stuff, and it can get all of the stuff in parallel. It will begin the <code>getNav</code>, <code>getAds</code>, <code>getWeather</code>, and <code>getMessageOfTheDay</code> jobs, and also begin <code>getHoroscope</code> and <code>getGossip</code>. Those last two are considered unimportant. If they can be finished before the four main jobs finish, then they will be included in the result. But we won't wait for them.</p>
-<pre>getStuff = RQ.parallel([<br>    getNav,<br>    getAds,
-    getWeather,<br>    getMessageOfTheDay<br>], [<br>    getHoroscope,<br>    getGossip<br>]);</pre>
+<pre>getStuff = RQ.parallel([
+    getNav,
+    getAds,
+    getWeather,
+    getMessageOfTheDay
+], [
+    getHoroscope,
+    getGossip
+]);</pre>
 <p><code>RQ</code> can also support races, where several jobs are started at once and the first one to finish successfully wins. We could have created the <code>getAds</code> requestor that was used above like this:</p>
-<pre>getAds = RQ.race([<br>    getAd(adnet.klikHaus),<br>    getAd(adnet.inUFace),<br>    getAd(adnet.trackPipe)<br>]);
+<pre>getAds = RQ.race([
+    getAd(adnet.klikHaus),
+    getAd(adnet.inUFace),
+    getAd(adnet.trackPipe)
+]);
 </pre>
-<p><code>getAd</code> is a factory function that makes requestors. <code>getAds</code> takes a parameter that identifies an advertising network. In this example,  requests will be made of of three advertising networks. The first to provide an acceptable response will win.</p>
+<p><code>getAd</code> is a factory function that makes requestors. <code>getAd</code> takes a parameter that identifies an advertising network. In this example,  requests will be made of of three advertising networks. The first to provide an acceptable response will win.</p>
 <p><code>RQ</code> can also support fallbacks. If Plan A fails, try Plan B. And if that fails, Plan C. The <code>getWeather</code> requestor that was used above could have been made as a fallback. It would first try to get a result from the local cache. If that fails, it will try the local database. If that fails, it will try the remote database.</p>
-<pre>getWeather = RQ.fallback([<br>    fetch(&quot;weather&quot;, localCache),<br>    fetch(&quot;weather&quot;, localDB),<br>    fetch(&quot;weather&quot;, remoteDB)<br>]);
+<pre>getWeather = RQ.fallback([
+    fetch(&quot;weather&quot;, localCache),
+    fetch(&quot;weather&quot;, localDB),
+    fetch(&quot;weather&quot;, remoteDB)
+]);
 </pre>
 <p><code>RQ</code> provides just four functions: <code>RQ.sequence</code>, <code>RQ.parallel</code>, <code>RQ.race</code>, and <code>RQ.fallback</code>. Each takes an array of requestors and returns a requestor that combines them into a unit. Each can also take an optional time limit which can cancel the jobs and produce an early failure if time runs out.</p>
 <h2>The RQ Library</h2>
-<p><code>RQ</code> is delivered as a single file, <a href="https://github.com/douglascrockford/RQ">rq.js</a>. When run, it produces an <code>RQ</code> variable containing an object containing four functions..</p>
+<p><code>RQ</code> is delivered as a single file, <a href="https://github.com/douglascrockford/RQ">rq.js</a>. When run, it produces an <code>RQ</code> variable containing an object containing four functions.</p>
 <h4>RQ.sequence(requestors)<br>
     RQ.sequence(requestors, milliseconds)</h4>
 <p><code>RQ.sequence</code> takes an array of requestor functions and an optional time limit in milliseconds. It returns a requestor function that will start each of the requestors in order, giving the result of each to the next one. If all complete successfully, the result will be the result of the last requestor in the array. If any of the requestors in the array fail, then the sequence fails. The array is not modified.</p>
@@ -128,46 +150,106 @@ RQ.parallel(requireds, milliseconds, optionals, untilliseconds)</h4>
 <p>If a milliseconds argument is provided, then the race will fail if it does not finish before the time limit.</p>
 <h4>RQ.fallback(requestors)<br>
 RQ.fallback(requestors, milliseconds)</h4>
-<p><code>RQ.fallback</code> takes an array of requestor functions and an optional time limit in milliseconds. It returns a requestor function try each of the requestors in order until one is successful.  If all of the requestors in the array fail, then the sequence fails. The array is not modified.</p>
+<p><code>RQ.fallback</code> takes an array of requestor functions and an optional time limit in milliseconds. It returns a requestor function that will try each of the requestors in order until one is successful.  If all of the requestors in the array fail, then the sequence fails. The array is not modified.</p>
 <p>If a milliseconds argument is provided, then the fallback will fail if it does not finish before the time limit.</p>
 <h2>Function Types</h2>
 <p><code>RQ</code> makes use of four types of functions: requestors, callbacks, cancels, and factories.</p>
-<h3>Requestor</h3>
-<p>A requestor is a function that represents some unit of work. It can be a simple function, or it can be a complex job, task, or production step that will organize the work of many machines over a long period of time. A requestor function takes two arguments: A callback and an optional value. The callback will be used by the requestor to communicate its result. The optional value makes the result of a previous value in a sequence to the requestor.</p>
+<h3>Requestor(callback, value)</h3>
+<p>A <i>requestor</i> is a function that represents some unit of work. It can be a simple function, or it can be a complex job, task, production step, or operation that will organize the work of many machines over a long period of time. A requestor function takes two arguments: A callback and an optional value. The callback will be used by the requestor to communicate its result. The optional value makes the result of a previous value in a sequence to the requestor.</p>
 <p>A requestor may optionally return a cancel function that can be used to cancel the request.</p>
-<h3>Callback</h3>
-<p>A callback is a function that is passed to a requestor so that the requestor can communicate its result. A callback can take two arguments, success and failure. If failure is <code>undefined</code>, then the requestor was successful. </p>
+<h3>Callback(success, failure)</h3>
+<p>A <i>callback</i> is a function that is passed to a requestor so that the requestor can communicate its result. A callback can take two arguments, success and failure. If failure is <code>undefined</code>, then the requestor was successful. </p>
 <p>You only have to provide a callback when calling a requestor directly, such as calling the result of <code>RQ.sequence</code> to start a multistep job. The result of the job will be the first argument passed to your callback function.</p>
-<h3>Cancel</h3>
-<p>A cancel is a function that will attempt to stop the execution of a requestor. A cancel function makes it possible to stop the processing of a job that is no longer needed. For example, if several requestors are started by <code>RQ.race</code> and if one of the requestors produces an successful result, the results of the other requestors may be cancelled. Cancellation is intended to stop unnecessary work. Cancellation does not do rollbacks or undo. </p>
+<h3>Cancel(reason)</h3>
+<p>A <i>cancel</i> is a function that will attempt to stop the execution of a requestor. A cancel function makes it possible to stop the processing of a job that is no longer needed. For example, if several requestors are started by <code>RQ.race</code> and if one of the requestors produces an successful result, the results of the other requestors may be cancelled. Cancellation is intended to stop unnecessary work. Cancellation does not do rollbacks or undo. </p>
 <p>A cancel function may optionally be returned by a requestor. If a requestor sends a message to another process requesting work, the cancel function should send a message to the same process indicating that the work is no longer needed.</p>
-<h3>Factory</h3>
-<p>A factory is a function that makes requestor functions. A factory will usually take arguments that allow for the customization of the requestor. The four functions provided by <code>RQ</code> (<code>RQ.sequence</code>, <code>RQ.parallel</code>, <code>RQ.race</code>, <code>RQ.fallback</code>) are all factory functions. Factory functions can simplify application development.</p>
+<h3>Factory( . . . )</h3>
+<p>A <i>factory</i> is a function that makes requestor functions. A factory will usually take arguments that allow for the customization of a requestor. The four functions provided by <code>RQ</code> (<code>RQ.sequence</code>, <code>RQ.parallel</code>, <code>RQ.race</code>, <code>RQ.fallback</code>) are all factory functions. Factory functions can simplify application development.</p>
 <h2>Timeouts</h2>
-<p>Sometimes  a correct result that takes too long is indistinguishable from a failure. <code>RQ</code> provides optional timeout value that limit the amount of time that a requestor is allowed to take. If a requestor takes too long to do its work, it can be automatically cancelled. <code>RQ.fallback</code> makes such failures recoverable.</p>
+<p>Sometimes  a correct result that takes too long is indistinguishable from a failure. <code>RQ</code> provides optional timeout values that limit the amount of time that a requestor is allowed to take. If a requestor takes too long to do its work, it can be automatically cancelled. <code>RQ.fallback</code> makes such failures recoverable.</p>
 <h2>Samples</h2>
 <h3>Identity Requestor</h3>
-<p>The identity requestor receives a value and delivers that value to its callback. If the identity requestor is placed in a sequence, it acts as a nop, sending the result of the previous requestor to the next requestor.</p>
-<pre>function identity_requestor(callback, value) {<br>    return callback(value);<br>}</pre>
+<p>The <code>identity_requestor</code> receives a value and delivers that value to its callback. If the identity requestor is placed in a sequence, it acts as a nop, sending the result of the previous requestor to the next requestor.</p>
+<pre>function identity_requestor(callback, value) {
+    return callback(value);
+}</pre>
 <h3>Fullname Requestor</h3>
-<p>The fullname requestor receives an object an delivers a string made from components of the object. </p>
-<pre>function fullname_requestor(callback, value) {<br>    return callback(value.firstname + ' ' + value.lastname);<br>}
-</pre>
+<p>The <code>fullname_requestor</code> receives an object and delivers a string made from properties of the object. </p>
+<pre>function fullname_requestor(callback, value) {
+    return callback(value.firstname + ' ' + value.lastname);
+}</pre>
 <h3>Requestorize Factory</h3>
-<p>The requestorize factory can make a requestor from any function that takes a single argument.</p>
-<pre>function requestorize(func) {<br>    return function requestor(callback, value) {<br>        return callback(func(value));<br>    };<br>}</pre>
+<p>The <code>requestorize</code> factory can make a requestor from any function that takes a single argument.</p>
+<pre>function requestorize(func) {
+    return function requestor(callback, value) {
+        return callback(func(value));
+    };
+}</pre>
 <p>We can use this to make processing steps in a sequence. For example, if we have a function that takes an object and returns a fullname:</p>
-<pre>function make_fullname(value) {<br>    return value.firstname + ' ' + value.lastname;<br>}</pre>
+<pre>function make_fullname(value) {
+    return value.firstname + ' ' + value.lastname;
+}</pre>
 <p>We can turn it into a requestor that works just like the <code>fullname_requestor</code>:</p>
 <pre>var fullname_requestor = requestorize(fullname_requestor);
 </pre>
 <h3>Delay Requestor</h3>
-<p>The delay requestor inserts a delay into a sequence without blocking. </p>
-<pre>function delay_requestor(callback, value) {<br>    var timeout_id = setTimeout(callback, 1000);<br>    return function cancel(reason) {<br>        return clearTimeout(timeout_id);<br>    };<br>}</pre>
+<p>The <code>delay_requestor</code> inserts a delay into a sequence without blocking. </p>
+<pre>function delay_requestor(callback, value) {
+    var timeout_id = setTimeout(callback, 1000);
+    return function cancel(reason) {
+        return clearTimeout(timeout_id);
+    };
+}</pre>
 <p>In a real requestor, instead of calling <code>setTimeout</code>, a message will be transmitted to a process, and instead of calling <code>clearTimeout</code>, a message will be transmitted to the same process to cancel the work.</p>
 <h3>Delay Factory</h3>
-<p>The delay factory simplifies the making of delay requestors.</p>
-<pre>function delay(milliseconds) {<br>    return function requestor(callback, value) {<br>        var timeout_id = setTimeout(callback, milliseconds);<br>        return function cancel(reason) {<br>            return clearTimeout(timeout_id);<br>        };<br>    };<br>}
-</pre>
+<p>The <code>delay</code> factory simplifies the making of delay requestors.</p>
+<pre>function delay(milliseconds) {
+    return function requestor(callback, value) {
+        var timeout_id = setTimeout(callback, milliseconds);
+        return function cancel(reason) {
+            return clearTimeout(timeout_id);
+        };
+    };
+}</pre>
+<h3>Construct Factory</h3>
+<p>The <code>construct</code> factory makes a requestor that  takes an array of results from a parallel operation and converts it into an object for use by subsequent operations in a sequence.</p>
+<pre>function construct(array) {
+    return function requestor(callback, value) {
+        var object = Object.create(null);
+        array.forEach(function (name, index) {
+            object[name] = value[index];
+        });
+        return callback(object);
+    };
+}</pre>
+<p>We could write our <code>buildPage</code> requestor to take an array of values, but it makes more sense of give it an object so that its code will be self documenting. The <code>construct</code> factory makes that easy.</p>
+<pre>
+respond = RQ.fallback([
+    RQ.sequence([
+        getId,
+        getPreference,
+        RQ.parallel([
+            getNav,
+            RQ.race([
+                getAd(adnet.klikHaus),
+                getAd(adnet.inUFace),
+                getAd(adnet.trackPipe)
+            ]),
+            RQ.fallback([
+                fetch(&quot;weather&quot;, localCache),
+                fetch(&quot;weather&quot;, localDB),
+                fetch(&quot;weather&quot;, remoteDB)
+            ]),
+            getMessageOfTheDay
+        ], [
+            getHoroscope,
+            getGossip
+        ], 50),
+        construct(['nav', 'ads', 'weather', 'message', 'horoscope', 'gossip']),
+        buildPage
+    ], 100),
+    planB
+]};</pre> 
+<p>To start things running, call <code>respond</code>, passing a callback function that will receive the final result, and the intial value that wll be given to <code>getId</code>.</p>
 </body>
 </html>
