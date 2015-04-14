@@ -3,7 +3,7 @@ RQ
 
 Douglas Crockford (2015-04-13)
 
-**RQ** is a small JavaScript library for managing asychronicity in
+**RQ** is a small JavaScript library for managing asynchronicity in
 server applications.
 
 The source is available at <https://github.com/douglascrockford/RQ>.
@@ -14,7 +14,7 @@ Asynchronicity
 --------------
 
 Asynchronicity is becoming the preferred method for solving a large
-class of problems, from user interfaces to servers. Asychronous
+class of problems, from user interfaces to servers. Asynchronous
 functions return control to the caller almost immediately. Success or
 failure will be communicated somehow in the future, but usually the
 caller will resume long before that occurs. The communication will
@@ -41,7 +41,7 @@ maintain, and much too slow.
 
 This pattern is so problematic that some of its users have denounced
 asynchronicity, declaring that it is unnatural and impossible to manage.
-But it turns out that the problem isn't with asyschronicity. The problem
+But it turns out that the problem isn't with asynchronicity. The problem
 is trying to do asynchronicity without proper tools. There are lots of
 tools available now, including promises. There are many good things that
 can be done with promises, but promises were not designed to help manage
@@ -127,7 +127,7 @@ getWeather = RQ.fallback([
 `RQ` provides just four functions: `RQ.sequence`, `RQ.parallel`,
 `RQ.race`, and `RQ.fallback`. Each takes an array of requestors and
 returns a requestor that combines them into a unit. Each can also take
-an optional timelimit which can cancel the jobs and produce an early
+an optional time limit which can cancel the jobs and produce an early
 failure if time runs out.
 
 The RQ Library
@@ -280,7 +280,7 @@ Samples
 
 ### Identity Requestor
 
-The identity requestor receives a value and delivers that vallue to its
+The identity requestor receives a value and delivers that value to its
 callback. If the identity requestor is placed in a sequence, it acts as
 a nop, sending the result of the previous requestor to the next
 requestor.
