@@ -1,13 +1,13 @@
 RQ
 ==
 
-Douglas Crockford\
- 2015-04-13
+Douglas Crockford (2015-04-13)
 
-**`RQ`** is a small JavaScript library for managing asychronicity in
+**RQ** is a small JavaScript library for managing asychronicity in
 server applications.
 
 The source is available at <https://github.com/douglascrockford/RQ>.
+
 This page is available at <http://www.RQ.crockford.com/>.
 
 Asynchronicity
@@ -65,12 +65,14 @@ For example, the `getNav` requestor will call the `getId` requestor,
 give that result to the `getPreference` requestor, and give that result
 to the `getCustomNav` requestor.
 
-    getNav = RQ.sequence([
-        getId,
-        getPreference,
-        getStuff,
-        getCustomNav,
-    ]);
+```javascript
+getNav = RQ.sequence([
+    getId,
+    getPreference,
+    getStuff,
+    getCustomNav,
+]);
+```
 
 The `getStuff` requestor that was used above will produce an array of
 stuff, and it can get all of the stuff in parallel. It will begin the
@@ -79,25 +81,29 @@ also begin `getHoroscope` and `getGossip`. Those last two are considered
 unimportant. If they can be finished before the four main jobs finish,
 then they will be included in the result. But we won't wait for them.
 
-    getStuff = RQ.parallel([
-        getNav,
-        getAds,
-        getWeather,
-        getMessageOfTheDay
-    ], [
-        getHoroscope,
-        getGossip
-    ]);
+```javascript
+getStuff = RQ.parallel([
+    getNav,
+    getAds,
+    getWeather,
+    getMessageOfTheDay
+], [
+    getHoroscope,
+    getGossip
+]);
+```
 
 `RQ` can also support races, where several jobs are started at once and
 the first one to finish successfully wins. We could have created the
 `getAds` requestor that was used above like this:
 
-    getAds = RQ.race([
-        getAd(adnet.klikHaus),
-        getAd(adnet.inUFace),
-        getAd(adnet.trackPipe)
-    ]);
+```javascript
+getAds = RQ.race([
+    getAd(adnet.klikHaus),
+    getAd(adnet.inUFace),
+    getAd(adnet.trackPipe)
+]);
+```
 
 `getAd` is a factory function that makes requestors. `getAds` takes a
 parameter that identifies an advertising network. In this example,
@@ -110,11 +116,13 @@ have been made as a fallback. It would first try to get a result from
 the local cache. If that fails, it will try the local database. If that
 fails, it will try the remote database.
 
-    getWeather = RQ.fallback([
-        fetch("weather", localCache),
-        fetch("weather", localDB),
-        fetch("weather", remoteDB)
-    ]);
+```javascript
+getWeather = RQ.fallback([
+    fetch("weather", localCache),
+    fetch("weather", localDB),
+    fetch("weather", remoteDB)
+]);
+```
 
 `RQ` provides just four functions: `RQ.sequence`, `RQ.parallel`,
 `RQ.race`, and `RQ.fallback`. Each takes an array of requestors and
@@ -129,8 +137,9 @@ The RQ Library
 [rq.js](https://github.com/douglascrockford/RQ). When run, it produces
 an `RQ` variable containing an object containing four functions..
 
-#### RQ.sequence(requestors)\
- RQ.sequence(requestors, milliseconds)
+#### RQ.sequence(requestors)
+
+* **RQ.sequence(requestors, milliseconds)**
 
 `RQ.sequence` takes an array of requestor functions and an optional time
 limit in milliseconds. It returns a requestor function that will start
@@ -142,12 +151,13 @@ then the sequence fails. The array is not modified.
 If a milliseconds argument is provided, then the sequence will fail if
 it does not finish before the time limit.
 
-#### RQ.parallel(requireds)\
- RQ.parallel(requireds, milliseconds)\
- RQ.parallel(requireds, optionals)\
- RQ.parallel(requireds, milliseconds, optionals)\
- RQ.parallel(requireds, optionals, untilliseconds)\
- RQ.parallel(requireds, milliseconds, optionals, untilliseconds)
+#### RQ.parallel(requireds)
+
+* **RQ.parallel(requireds, milliseconds)**
+* **RQ.parallel(requireds, optionals)**
+* **RQ.parallel(requireds, milliseconds, optionals)**
+* **RQ.parallel(requireds, optionals, untilliseconds)**
+* **RQ.parallel(requireds, milliseconds, optionals, untilliseconds)**
 
 `RQ.parallel` takes an array of required requestor functions, and an
 optional time limit in milliseconds, and an optional array of optional
@@ -177,8 +187,9 @@ the universe. It is likely that many of the requestors will be
 communicating with other processes and other machines. Those other
 processes and machines will be executing independently.
 
-#### RQ.race(requestors)\
- RQ.race(requestors, milliseconds)
+#### RQ.race(requestors)
+
+* **RQ.race(requestors, milliseconds)**
 
 `RQ.race` takes an array of requestor functions and an optional time
 limit in milliseconds. It returns a requestor function that will start
@@ -189,8 +200,9 @@ fails. The array is not modified.
 If a milliseconds argument is provided, then the race will fail if it
 does not finish before the time limit.
 
-#### RQ.fallback(requestors)\
- RQ.fallback(requestors, milliseconds)
+#### RQ.fallback(requestors)
+
+* **RQ.fallback(requestors, milliseconds)**
 
 `RQ.fallback` takes an array of requestor functions and an optional time
 limit in milliseconds. It returns a requestor function try each of the
@@ -273,36 +285,44 @@ callback. If the identity requestor is placed in a sequence, it acts as
 a nop, sending the result of the previous requestor to the next
 requestor.
 
-    function identity_requestor(callback, value) {
-        return callback(value);
-    }
+```javascript
+function identity_requestor(callback, value) {
+    return callback(value);
+}
+```
 
 ### Fullname Requestor
 
 The fullname requestor receives an object an delivers a string made from
 components of the object.
 
-    function fullname_requestor(callback, value) {
-        return callback(value.firstname + ' ' + value.lastname);
-    }
+```javascript
+function fullname_requestor(callback, value) {
+    return callback(value.firstname + ' ' + value.lastname);
+}
+```
 
 ### Requestorize Factory
 
 The requestorize factory can make a requestor from any function that
 takes a single argument.
 
-    function requestorize(func) {
-        return function requestor(callback, value) {
-            return callback(func(value));
-        };
-    }
+```javascript
+function requestorize(func) {
+    return function requestor(callback, value) {
+        return callback(func(value));
+    };
+}
+```
 
 We can use this to make processing steps in a sequence. For example, if
 we have a function that takes an object and returns a fullname:
 
-    function make_fullname(value) {
-        return value.firstname + ' ' + value.lastname;
-    }
+```javascript
+function make_fullname(value) {
+    return value.firstname + ' ' + value.lastname;
+}
+```
 
 We can turn it into a requestor that works just like the
 `fullname_requestor`:
@@ -313,12 +333,14 @@ We can turn it into a requestor that works just like the
 
 The delay requestor inserts a delay into a sequence without blocking.
 
-    function delay_requestor(callback, value) {
-        var timeout_id = setTimeout(callback, 1000);
-        return function cancel(reason) {
-            return clearTimeout(timeout_id);
-        };
-    }
+```javascript
+function delay_requestor(callback, value) {
+    var timeout_id = setTimeout(callback, 1000);
+    return function cancel(reason) {
+        return clearTimeout(timeout_id);
+    };
+}
+```
 
 In a real requestor, instead of calling `setTimeout`, a message will be
 transmitted to a process, and instead of calling `clearTimeout`, a
@@ -328,11 +350,13 @@ message will be transmitted to the same process to cancel the work.
 
 The delay factory simplifies the making of delay requestors.
 
-    function delay(milliseconds) {
-        return function requestor(callback, value) {
-            var timeout_id = setTimeout(callback, milliseconds);
-            return function cancel(reason) {
-                return clearTimeout(timeout_id);
-            };
+```javascript
+function delay(milliseconds) {
+    return function requestor(callback, value) {
+        var timeout_id = setTimeout(callback, milliseconds);
+        return function cancel(reason) {
+            return clearTimeout(timeout_id);
         };
-    }
+    };
+}
+```

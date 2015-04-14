@@ -1,7 +1,9 @@
-# RQ: Better living through asynchronicity
+# RQ
+> Better living through asynchronicity
 
-Douglas Crockford
-2013-06-21
+This is a CommonJS-compatible port of this library for node.js/io.js.
+
+The original source is available at: <https://github.com/douglascrockford/RQ>
 
 ## Introduction
 
@@ -14,12 +16,71 @@ ease of use for tasks which are common to server applications by providing
 support of sequences, parallel operations, with timeouts and cancellations.
 
 ## Installation
-
 ```
 $ npm install async-rq
 ```
 
 ## Usage
+For complete documentation see [help.md](help.md).
 
-See [help.md](help.md).
+```javascript
+var RQ = require('RQ');
+```
 
+### `RQ.sequence()` example
+```javascript
+function widget(name, delay) {
+  return function requestor(callback, value) {
+    setTimeout(function() {
+      if(!value) value = '(start)';
+      callback(value + ' -> ' + name);
+    }, delay);
+  };
+}
+
+var runner = RQ.sequence([
+  widget('Seq A1', 100),
+  widget('Seq A2', 10),
+  widget('Seq A3', 1),
+  function(callback, value) {
+    callback(value + ' -> (end)');
+  }
+]);
+
+runner(function(success, failure) {
+  console.log(success);
+});
+```
+
+### `RQ.race()` example
+
+```javascript
+function timer(i, delay) {
+  return function requestor(callback, value) {
+    setTimeout(function() {
+      callback(i);
+    }, delay);
+  }
+}
+
+var racer = RQ.race([
+  timer(1, 1000),
+  timer(2, 500),
+  timer(3, 520),
+]);
+
+racer(function(success, failure) {
+  console.log(success);
+});
+```
+
+Result will be:
+```
+2
+```
+
+## Author
+Douglas Crockford ([@douglascrockford](https://github.com/douglascrockford))
+
+## Licence
+?
