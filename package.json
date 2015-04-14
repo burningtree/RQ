@@ -1,0 +1,22 @@
+{
+  "name": "RQ",
+  "version": "0.0.1",
+  "description": "Better living through asynchronicity",
+  "main": "rq.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/burningtree/node-RQ.git"
+  },
+  "keywords": [
+    "async"
+  ],
+  "author": "Douglas Crockford <douglas@crockford.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/douglascrockford/RQ/issues"
+  },
+  "homepage": "http://rq.crockford.com/"
+}

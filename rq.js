@@ -140,7 +140,7 @@ RQ.sequence(requestors [, milliseconds])
     message, method, milliseconds, name, parallel, race, sequence, value
 */
 
-var RQ = (function () {
+module.exports = (function () {
     'use strict';
 
     function expired(method, milliseconds) {
