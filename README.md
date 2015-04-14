@@ -52,6 +52,11 @@ runner(function(success, failure) {
 });
 ```
 
+Result:
+```
+(start) -> Seq A1 -> Seq A2 -> Seq A3 -> (end)
+```
+
 ### `RQ.race()` example
 
 ```javascript

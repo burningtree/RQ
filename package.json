@@ -8,7 +8,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/burningtree/node-RQ.git"
+    "url": "https://github.com/burningtree/async-rq.git"
   },
   "keywords": [
     "async"
