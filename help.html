@@ -90,6 +90,17 @@ code {
 <p>The source is available at  <a href="https://github.com/douglascrockford/RQ">https://github.com/douglascrockford/RQ</a>. This page is available at <a href="http://www.RQ.crockford.com/">http://www.RQ.crockford.com/</a>. It is in the Public Domain.</p>
 <h2>Asynchronicity</h2>
 <p>Asynchronicity is becoming the preferred method for solving a large class of problems, from user interfaces to servers. Asynchronous functions return  control to the caller almost immediately. Success or failure will be communicated somehow in the future, but usually the caller will resume long before that occurs. The communication will probably make use of some sort of callback function or continuation.</p>
+<p>At its simplest, it means that instead of writing</p>
+<pre>function oldway( . . . ) {
+    . . .
+    return result;
+}</pre>
+<p>we now sometimes write</p>
+<pre>function newway(callback, . . . ) {
+    . . .
+    return callback(result);
+}</pre>
+<p>But of course it is not that simple.</p>
 <p>Servers offer workflows that are significantly different than those found in user interfaces. An incoming message many require several processing steps in which the result of each step is given to the next step. Since each step may be concluded in a different processing turn, callbacks must be used. The program may not block while awaiting results. The na&iuml;ve approach is start each step in the callback function of the previous step. This is a very awkward way to write, producing programs that are brittle, difficult to read, and difficult to maintain. </p>
 <p>A workflow might have several independent steps, which means that those steps could be taken in parallel, which could have  significant performance benefits. The elapsed time of the steps could be the slowest of all of the steps, instead of the total of all of the steps, which could be a dramatic speed up. But it is not obvious how to take advantage of  parallelism with simple callbacks. The na&iuml;ve approach is to perform each step serially. This is a very awkward way to write, producing programs that a brittle, difficult to read,  difficult to maintain, and much too slow. </p>
 <p>This pattern is so problematic that some of its users have denounced asynchronicity, declaring that it is unnatural and impossible to manage. But it turns out that the problem isn't with asynchronicity. The problem is trying to do asynchronicity without proper tools. There are lots of tools available now, including promises. There are many good things that can be done with promises, but promises were not designed to help manage workflows in servers. </p>
