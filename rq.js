@@ -109,8 +109,8 @@ RQ.parallel(requireds [, milliseconds], optionals [,untilliseconds])
     untilliseconds timer has expired.
 
     The result maps the required requestors and optional requestors into a
-    single array. The value produced by the first element of the requestors array provides the
-    first element of the result.
+    single array. The value produced by the first element of the requestors
+    array provides the first element of the result.
 
     If the optional milliseconds argument is supplied, then if all of the
     required requestors are not successful in the allotted time, then the
@@ -157,7 +157,7 @@ module.exports = (function () {
 
     function check(method, requestors, milliseconds, optionals, untilliseconds) {
 
-// Verify that the arguments are typed properly.        
+// Verify that the arguments are typed properly.
 
 // requestors must be an array of functions, and it may be empty only if
 // optionals is present.
