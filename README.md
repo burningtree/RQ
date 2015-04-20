@@ -24,7 +24,7 @@ $ npm install async-rq
 For complete documentation see [help.md](help.md).
 
 ```javascript
-var RQ = require('RQ');
+var RQ = require('async-rq');
 ```
 
 ### `RQ.sequence()` example
