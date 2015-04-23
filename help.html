@@ -1,5 +1,11 @@
 <html>
 <head>
+<meta charset="utf-8">
+<meta name="description" content="RQ is a small JavaScript library for
+managing asynchronicity in server applications.">
+<meta name="author" content="Douglas Crockford">
+<meta name="date" content="2015-04-22">
+<title>JSLint: The JavaScript Code Quality Tool</title>
 <title>RQ</title>
 <style>
 body {
@@ -86,7 +92,7 @@ code {
 <p>Douglas Crockford<br>
     2015-04-14
 </p>
-<p><b><code>RQ</code></b> is a small JavaScript library for managing asynchronicity in server applications. </p>
+<p><b><code>RQ</code></b> is a small JavaScript library for managing asynchronicity in server applications.</p>
 <p>The source is available at  <a href="https://github.com/douglascrockford/RQ">https://github.com/douglascrockford/RQ</a>. This page is available at <a href="http://www.RQ.crockford.com/">http://www.RQ.crockford.com/</a>. It is in the Public Domain.</p>
 <h2>Asynchronicity</h2>
 <p>Asynchronicity is becoming the preferred method for solving a large class of problems, from user interfaces to servers. Asynchronous functions return  control to the caller almost immediately. Success or failure will be communicated somehow in the future, but usually the caller will resume long before that occurs. The communication will probably make use of some sort of callback function or continuation.</p>
@@ -201,7 +207,7 @@ RQ.fallback(requestors, milliseconds)</h4>
     return value.firstname + ' ' + value.lastname;
 }</pre>
 <p>We can turn it into a requestor that works just like the <code>fullname_requestor</code>:</p>
-<pre>var fullname_requestor = requestorize(fullname_requestor);
+<pre>var fullname_requestor = requestorize(make_fullname);
 </pre>
 <h3>Delay Requestor</h3>
 <p>The <code>delay_requestor</code> inserts a delay into a sequence without blocking. </p>
@@ -260,7 +266,7 @@ respond = RQ.fallback([
         buildPage
     ], 100),
     planB
-]};</pre> 
+]};</pre>
 <p>To start things running, call <code>respond</code>, passing a callback function that will receive the final result, and the intial value that wll be given to <code>getId</code>.</p>
 </body>
 </html>
