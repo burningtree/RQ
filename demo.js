@@ -17,8 +17,8 @@ function widget(name) {
     'use strict';
     return function requestor(callback, value) {
         var result = value
-            ? value + '>' + name
-            : name,
+                ? value + '>' + name
+                : name,
             demo = document.getElementById("demo"),
             fieldset = document.createElement("fieldset"),
             legend = document.createElement("legend"),

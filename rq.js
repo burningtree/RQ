@@ -2,7 +2,7 @@
     rq.js
 
     Douglas Crockford
-    2015-04-09
+    2015-05-02
     Public Domain
 
 This package uses four kinds of functions:
@@ -263,8 +263,8 @@ module.exports = (function () {
                                             once = false;
                                             cancellation = null;
                                             return failure === undefined
-                                            ? finish(success)
-                                            : next(index + 1, failure);
+                                                ? finish(success)
+                                                : next(index + 1, failure);
                                         }
                                     },
                                     initial
@@ -347,8 +347,8 @@ module.exports = (function () {
                         return requireds_remaining === 0 && (
                             requireds_length > 0 || optionals_successes > 0
                         )
-                        ? finish(results)
-                        : cancel(expired("RQ.parallel", milliseconds));
+                            ? finish(results)
+                            : cancel(expired("RQ.parallel", milliseconds));
                     }, milliseconds);
                 }
 
@@ -418,8 +418,8 @@ module.exports = (function () {
                                                 if (requireds_remaining === 0) {
                                                     return requireds_length > 0 ||
                                                             optionals_successes > 0
-                                                    ? finish(results)
-                                                    : cancel(failure);
+                                                        ? finish(results)
+                                                        : cancel(failure);
                                                 }
                                                 if (timeout_until) {
                                                     clearTimeout(timeout_until);
